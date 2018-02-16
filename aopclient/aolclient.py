@@ -159,11 +159,11 @@ class AOLClient:
     return self.__get_response_object(response)
 
   def assign_deal_assignments(self, org_id=0, ad_id=0, campaign_id=0, tactic_id=0, deals=[]):
-    current_deals = json.loads(self.get_deal_assignments(org_id, ad_id, tactic_id))
+    current_deals = json.loads(self.get_deal_assignments(org_id, ad_id, campaign_id, tactic_id))
     remove_deals = []
     for deal in current_deals.get('data').get('data'):
       remove_deals.append(deal.get('dealManagementId'))
-    self.unassign_deal_assignments(org_id, ad_id, tactic_id, remove_deals)
+    self.unassign_deal_assignments(org_id, ad_id, campaign_id, tactic_id, remove_deals)
 
     url = "https://{0}/advertiser/campaign-management/v1/organizations/{1}/advertisers/{2}/campaigns/{3}/tactics/{4}/dealassignments".format(self.one_host, org_id, ad_id, campaign_id, tactic_id)
     data = []
@@ -174,10 +174,7 @@ class AOLClient:
 
   def unassign_deal_assignments(self, org_id=0, ad_id=0, campaign_id=0, tactic_id=0, deals=[]):
     url = "https://{0}/advertiser/campaign-management/v1/organizations/{1}/advertisers/{2}/campaigns/{3}/tactics/{4}/dealassignments".format(self.one_host, org_id, ad_id, campaign_id, tactic_id)
-    data = HTTPHeaderDict()
-    for deal in deals:
-        data.add('dealAssignmentId', str(deal))    
-    response = self._send_request(url, self.authorized_headers, method="DELETE", data=data)
+    response = self._send_request(url, self.authorized_headers, method="DELETE", data=json.dumps(data))
     return self.__get_response_object(response, data)
 
   def get_flight_by_id(self, org_id=0, ad_id=0, campaign_id=0, tactic_id=0, flight_id=0):
