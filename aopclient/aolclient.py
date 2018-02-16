@@ -387,6 +387,29 @@ class AOLClient:
       if method == "PATCH":
           response = requests.patch(url, headers=headers, verify=True, data=data)
 
+      rval = {}
+      codes = [200,201]
+      rval["response_code"] = response.status_code
+      rval["data"] = response.status_code
+      request_body = {
+          "url": url
+      }
+      if data:
+          request_body["data"] = data
+      rval["request_body"] = request_body
+      if response.status_code in codes:
+          rval["msg_type"] = "success"
+      else:
+          rval["msg_type"] = "error"
+
+      try:
+          rval["msg"] = json.loads(response.text)['message']
+      except:
+          rval["msg"] = ""
+
+      return json.dumps(rval)
+
+      """
       print('--- response.status_code: {} ---'.format(response.status_code))
       codes = [200,201]
       if (response.status_code in codes) != True:
@@ -402,4 +425,5 @@ class AOLClient:
                   message=message))
 
       return response
+      """
 # eof
