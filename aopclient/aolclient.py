@@ -285,14 +285,7 @@ class AOLClient:
   def update_whitelist(self, org_id=0, ad_id=0, whitelist_id=0, domains=[], apps=[]):
     url = "https://{0}/advertiser/inventory-management/v1/organizations/{1}/advertisers/{2}/whitelists/{3}".format(self.one_host, org_id, ad_id, whitelist_id)
     current_domains = json.loads(self.get_domains_by_whitelist(org_id, ad_id, whitelist_id))
-    #current_domain_names = []
-    #for domain in current_domains.get('data').get('data'):
-      #current_domain_names.append(str(domain.get('name')))
-
     current_apps = json.loads(self.get_apps_by_whitelist(org_id, ad_id, whitelist_id))
-    #current_app_names = []
-    #for app in current_apps.get('data').get('data'):
-      #current_app_names.append(str(app.get('bundleId')))
 
     data = []
     for domain in current_domains.get('data').get('data'):
