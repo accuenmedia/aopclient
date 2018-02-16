@@ -404,7 +404,7 @@ class AOLClient:
       rval = {}
       codes = [200,201]
       rval["response_code"] = response.status_code
-      rval["data"] = response.text
+      rval["data"] = json.loads(response.text)
       request_body = {
           "url": response.url
       }
