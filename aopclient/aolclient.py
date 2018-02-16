@@ -106,72 +106,65 @@ class AOLClient:
   def get_organizations(self):
     url = "https://{0}/advertiser/organization-management/v1/organizations/".format(self.one_host)
     response = self._send_request(url, self.authorized_headers, method="GET")
-    return json.loads(response.text)
+    return self.__get_response_object(response)
 
   def get_organization(self, id):
     url = "https://{0}/advertiser/organization-management/v1/organizations/{1}".format(self.one_host, id)
     response = self._send_request(url, self.authorized_headers, method="GET")
-    return json.loads(response.text)
-      
+    return self.__get_response_object(response)
 
   def get_advertisers(self, org_id=0):
     url = "https://{0}/advertiser/advertiser-management/v1/organizations/{1}/advertisers".format(self.one_host, org_id)
     response = self._send_request(url, self.authorized_headers, method="GET")
-    return json.loads(response.text)
+    return self.__get_response_object(response)
 
   def get_advertiser(self, org_id=0, ad_id=0):
     url = "https://{0}/advertiser/advertiser-management/v1/organizations/{1}/advertisers/{2}".format(self.one_host, org_id, ad_id)
     response = self._send_request(url, self.authorized_headers, method="GET")
-    return json.loads(response.text)
+    return self.__get_response_object(response)
 
   def get_campaigns(self, org_id=0):
     url = "https://{0}/advertiser/campaign-management/v1/organizations/{1}/advertisers/campaigns".format(self.one_host, org_id)
     response = self._send_request(url, self.authorized_headers, method="GET")
-    return json.loads(response.text)
+    return self.__get_response_object(response)
 
   def get_campaigns_by_advertiser(self, org_id=0, ad_id=0):
     url = "https://{0}/advertiser/campaign-management/v1/organizations/{1}/advertisers/{2}/campaigns".format(self.one_host, org_id, ad_id)
     response = self._send_request(url, self.authorized_headers, method="GET")
-    return json.loads(response.text)
+    return self.__get_response_object(response)
 
   def get_campaigns_by_advertiser_by_campaign(self, org_id=0, ad_id=0, campaign_id=0):
     url = "https://{0}/advertiser/campaign-management/v1/organizations/{1}/advertisers/{2}/campaigns/{3}".format(self.one_host, org_id, ad_id, campaign_id)
     response = self._send_request(url, self.authorized_headers, method="GET")
-    print "1 @#$#@$@#$#@$#@$#@$#@$"
-    print response
-    print "#$%$#%$#%$#%$#%$#%#$%$#"
-    return json.loads(response.text)
+    return self.__get_response_object(response)
 
   def get_tactics_by_campaign(self, org_id=0, ad_id=0, campaign_id=0):
     url = "https://{0}/advertiser/campaign-management/v1/organizations/{1}/advertisers/{2}/campaigns/{3}/tactics".format(self.one_host, org_id, ad_id, campaign_id)
     response = self._send_request(url, self.authorized_headers, method="GET")
-    return json.loads(response.text)
+    return self.__get_response_object(response)
 
   def get_tactic_by_id(self, org_id=0, ad_id=0, campaign_id=0, tactic_id=0):
     url = "https://{0}/advertiser/campaign-management/v1/organizations/{1}/advertisers/{2}/campaigns/{3}/tactics/{4}".format(self.one_host, org_id, ad_id, campaign_id, tactic_id)
     response = self._send_request(url, self.authorized_headers, method="GET")
-    return json.loads(response.text)
+    return self.__get_response_object(response)
 
   def get_creative_assignments(self, org_id=0, ad_id=0, campaign_id=0, tactic_id=0):
     url = "https://{0}/advertiser/campaign-management/v1/organizations/{1}/advertisers/{2}/campaigns/{3}/tactics/{4}/creativeassignments".format(self.one_host, org_id, ad_id, campaign_id, tactic_id)
     response = self._send_request(url, self.authorized_headers, method="GET")
-    print("{}".format(json.loads(response.text)))
-    return json.loads(response.text)
+    return self.__get_response_object(response)
 
   def get_deal_assignments(self, org_id=0, ad_id=0, campaign_id=0, tactic_id=0):
     url = "https://{0}/advertiser/campaign-management/v1/organizations/{1}/advertisers/{2}/campaigns/{3}/tactics/{4}/dealassignments".format(self.one_host, org_id, ad_id, campaign_id, tactic_id)
     response = self._send_request(url, self.authorized_headers, method="GET")
-    print("{}".format(json.loads(response.text)))
-    return json.loads(response.text)
+    return self.__get_response_object(response)
 
   def assign_deal_assignments(self, org_id=0, ad_id=0, campaign_id=0, tactic_id=0, deals=[]):
     url = "https://{0}/advertiser/campaign-management/v1/organizations/{1}/advertisers/{2}/campaigns/{3}/tactics/{4}/dealassignments".format(self.one_host, org_id, ad_id, campaign_id, tactic_id)
-    deal_data = []
+    data = []
     for deal in deals:
-      deal_data.append(deal)
-    response = self._send_request(url, self.authorized_headers, method="POST", data=json.dumps(deal_data))
-    print("{}".format(json.loads(response.text)))
-    return json.loads(response.text)
+      data.append(deal)
+    response = self._send_request(url, self.authorized_headers, method="POST", data=json.dumps(data))
+    return self.__get_response_object(response, data)
 
   def unassign_deal_assignments(self, org_id=0, ad_id=0, campaign_id=0, tactic_id=0, deals=[]):
     url = "https://{0}/advertiser/campaign-management/v1/organizations/{1}/advertisers/{2}/campaigns/{3}/tactics/{4}/dealassignments".format(self.one_host, org_id, ad_id, campaign_id, tactic_id)
@@ -179,41 +172,39 @@ class AOLClient:
     for deal in deals:
         data.add('dealAssignmentId', str(deal))    
     response = self._send_request(url, self.authorized_headers, method="DELETE", data=data)
-    print("{}".format(json.loads(response.text)))
-    return json.loads(response.text)
+    return self.__get_response_object(response, data)
 
 
   def get_flight_by_id(self, org_id=0, ad_id=0, campaign_id=0, tactic_id=0, flight_id=0):
     url = "https://{0}/advertiser/campaign-management/v1/organizations/{1}/advertisers/{2}/campaigns/{3}/tactics/{4}/flights/{5}".format(self.one_host, org_id, ad_id, campaign_id, tactic_id, flight_id)
     response = self._send_request(url, self.authorized_headers, method="GET")
-    return json.loads(response.text)
-
+    return self.__get_response_object(response)
 
   def get_flights_by_tactic_id(self, org_id=0, ad_id=0, campaign_id=0, tactic_id=0):
     url = "https://{0}/advertiser/campaign-management/v1/organizations/{1}/advertisers/{2}/campaigns/{3}/tactics/{4}/flights".format(self.one_host, org_id, ad_id, campaign_id, tactic_id)
     response = self._send_request(url, self.authorized_headers, method="GET")
-    return json.loads(response.text)
+    return self.__get_response_object(response)
 
   def get_private_deals_by_advertiser(self, org_id=0, ad_id=0, limit=0, offset=0):
     url = "https://{0}/advertiser/inventory-management/v1/organizations/{1}/advertisers/{2}/deals".format(self.one_host, org_id, ad_id)
     if limit > 0 or offset > 0:
         url = url + "?limit={0}&offset={1}".format(limit, offset)        
     response = self._send_request(url, self.authorized_headers, method="GET")
-    return json.loads(response.text)
+    return self.__get_response_object(response)
 
   def get_private_deal_assignments_by_tactic(self, org_id=0, ad_id=0, campaign_id=0, tactic_id=0, limit=0, offset=0):
     url = "https://{0}/advertiser/campaign-management/v1/organizations/{1}/advertisers/{2}/campaigns/{3}/tactics/{4}/dealassignments".format(self.one_host, org_id, ad_id, campaign_id, tactic_id, limit, offset)
     if limit > 0 or offset > 0:
         url = url + "?limit={0}&offset={1}".format(limit, offset)        
     response = self._send_request(url, self.authorized_headers, method="GET")
-    return json.loads(response.text)
+    return self.__get_response_object(response)
 
   def get_blacklists_by_advertiser(self, org_id=0, ad_id=0, limit=0, offset=0):
     url = "https://{0}/advertiser/inventory-management/v1/organizations/{1}/advertisers/{2}/blacklists".format(self.one_host, org_id, ad_id, limit, offset)
     if limit > 0 or offset > 0:
         url = url + "?limit={0}&offset={1}".format(limit, offset)        
     response = self._send_request(url, self.authorized_headers, method="GET")
-    return json.loads(response.text)
+    return self.__get_response_object(response)
 
   def create_blacklist_by_advertiser(self, org_id=0, ad_id=0, name='', domains=[], apps=[], default=False):
     url = "https://{0}/advertiser/inventory-management/v1/organizations/{1}/advertisers/{2}/blacklists".format(self.one_host, org_id, ad_id)
@@ -223,7 +214,7 @@ class AOLClient:
     data['apps'] = apps
     data['default'] = default
     response = self._send_request(url, self.authorized_headers, method="POST", data=json.dumps(data))
-    return json.loads(response.text)
+    return self.__get_response_object(response, data)
 
   def update_blacklist_by_advertiser(self, org_id=0, ad_id=0, blacklist_id=0, op='REPLACE', path='/name', value=''):
     url = "https://{0}/advertiser/inventory-management/v1/organizations/{1}/advertisers/{2}/blacklists/{3}".format(self.one_host, org_id, ad_id, blacklist_id)
@@ -234,48 +225,49 @@ class AOLClient:
     data_list = []
     data_list.append(data)
     response = self._send_request(url, self.authorized_headers, method="PATCH", data=json.dumps(data_list))
-    return json.loads(response.text)
+    return self.__get_response_object(response, data_list)
     
   def update_tactics_blacklist(self, org_id=0, ad_id=0, campaign_id=0, tactic_id=0, blacklist_id=0):
     url = "https://{0}/advertiser/campaign-management/v1/organizations/{1}/advertisers/{2}/campaigns/{3}/tactics/{4}/blacklists".format(self.one_host, org_id, ad_id, campaign_id, tactic_id)
     data = {}
     data['blacklistid'] = blacklist_id
     response = self._send_request(url, self.authorized_headers, method="PUT", data=data)
+    return self.__get_response_object(response, data)
 
   def get_blacklists_by_tactic(self, org_id=0, ad_id=0, campaign_id=0, tactic_id=0, limit=0, offset=0):
     url = "https://{0}/advertiser/campaign-management/v1/organizations/{1}/advertisers/{2}/campaigns/{3}/tactics/{4}/blacklists".format(self.one_host, org_id, ad_id, campaign_id, tactic_id, limit, offset)
     if limit > 0 or offset > 0:
         url = url + "?limit={0}&offset={1}".format(limit, offset)        
     response = self._send_request(url, self.authorized_headers, method="GET")
-    return json.loads(response.text)
+    return self.__get_response_object(response)
 
   def get_domains_by_blacklist(self, org_id=0, ad_id=0, blacklist_id=0, limit=0, offset=0):
     url = "https://{0}/advertiser/inventory-management/v1/organizations/{1}/advertisers/{2}/blacklists/{3}/domains".format(self.one_host, org_id, ad_id, blacklist_id, limit, offset)
     if limit > 0 or offset > 0:
         url = url + "?limit={0}&offset={1}".format(limit, offset)        
     response = self._send_request(url, self.authorized_headers, method="GET")
-    return json.loads(response.text)
+    return self.__get_response_object(response)
       
   def get_domains_by_whitelist(self, org_id=0, ad_id=0, whitelist_id=0, limit=0, offset=0):
     url = "https://{0}/advertiser/inventory-management/v1/organizations/{1}/advertisers/{2}/blacklists/{3}/domains".format(self.one_host, org_id, ad_id, whitelist_id, limit, offset)
     if limit > 0 or offset > 0:
         url = url + "?limit={0}&offset={1}".format(limit, offset)        
     response = self._send_request(url, self.authorized_headers, method="GET")
-    return json.loads(response.text)
+    return self.__get_response_object(response)
 
   def get_whitelists_by_tactic(self, org_id=0, ad_id=0, campaign_id=0, tactic_id=0, limit=0, offset=0):      
     url = "https://{0}/advertiser/campaign-management/v1/organizations/{1}/advertisers/{2}/campaigns/{3}/tactics/{4}/whitelists".format(self.one_host, org_id, ad_id, campaign_id, tactic_id, limit, offset)
     if limit > 0 or offset > 0:
         url = url + "?limit={0}&offset={1}".format(limit, offset)        
     response = self._send_request(url, self.authorized_headers, method="GET")
-    return json.loads(response.text)
+    return self.__get_response_object(response)
 
   def get_whitelists_by_advertiser(self, org_id=0, ad_id=0, limit=0, offset=0):
     url = "https://{0}/advertiser/inventory-management/v1/organizations/{1}/advertisers/{2}/whitelists".format(self.one_host, org_id, ad_id, limit, offset)
     if limit > 0 or offset > 0:
         url = url + "?limit={0}&offset={1}".format(limit, offset)        
     response = self._send_request(url, self.authorized_headers, method="GET")
-    return json.loads(response.text)
+    return self.__get_response_object(response)
 
   def create_whitelist_by_advertiser(self, org_id=0, ad_id=0, name='', domains=[], apps=[], default=False):
     url = "https://{0}/advertiser/inventory-management/v1/organizations/{1}/advertisers/{2}/whitelists".format(self.one_host, org_id, ad_id)
@@ -285,7 +277,7 @@ class AOLClient:
     data['apps'] = apps
     data['default'] = default
     response = self._send_request(url, self.authorized_headers, method="POST", data=json.dumps(data))
-    return json.loads(response.text)
+    return self.__get_response_object(response, data)
 
   def update_whitelist_by_advertiser(self, org_id=0, ad_id=0, whitelist_id=0, op='REPLACE', path='/name', value=''):
     url = "https://{0}/advertiser/inventory-management/v1/organizations/{1}/advertisers/{2}/whitelists/{3}".format(self.one_host, org_id, ad_id, whitelist_id)
@@ -296,41 +288,42 @@ class AOLClient:
     data_list = []
     data_list.append(data)
     response = self._send_request(url, self.authorized_headers, method="PATCH", data=json.dumps(data_list))
-    return json.loads(response.text)
+    return self.__get_response_object(response, data_list)
 
   def update_tactics_whitelist(self, org_id=0, ad_id=0, campaign_id=0, tactic_id=0, whitelist_id=0):
     url = "https://{0}/advertiser/campaign-management/v1/organizations/{1}/advertisers/{2}/campaigns/{3}/tactics/{4}/whitelists".format(self.one_host, org_id, ad_id, campaign_id, tactic_id)
     data = {}
     data['whitelistid'] = whitelist_id
     response = self._send_request(url, self.authorized_headers, method="PUT", data=json.dumps(data))
+    return self.__get_response_object(response, data)
 
   def get_apps_by_whitelist(self, org_id=0, ad_id=0, whitelist_id=0, limit=0, offset=0):
     url = "https://{0}/advertiser/inventory-management/v1/organizations/{1}/advertisers/{2}/whitelists/{3}/apps".format(self.one_host, org_id, ad_id, whitelist_id, limit, offset)
     if limit > 0 or offset > 0:
         url = url + "?limit={0}&offset={1}".format(limit, offset)        
     response = self._send_request(url, self.authorized_headers, method="GET")
-    return json.loads(response.text)
+    return self.__get_response_object(response)
 
   def get_creatives_by_tactic(self, org_id=0, ad_id=0, campaign_id=0, tactic_id=0, limit=0, offset=0):
     url = "https://{0}/advertiser/campaign-management/v1/organizations/{1}/advertisers/{2}/campaigns/{3}/tactics/{4}/creativeassignments".format(self.one_host, org_id, ad_id, campaign_id, tactic_id, limit, offset)
     if limit > 0 or offset > 0:
         url = url + "?limit={0}&offset={1}".format(limit, offset)        
     response = self._send_request(url, self.authorized_headers, method="GET")
-    return json.loads(response.text)
+    return self.__get_response_object(response)
 
   def get_inventory_sources_by_tactic(self, org_id=0, ad_id=0, campaign_id=0, tactic_id=0, limit=0, offset=0):
     url = "https://{0}/advertiser/campaign-management/v1/organizations/{1}/advertisers/{2}/campaigns/{3}/tactics/{4}/inventorysources".format(self.one_host, org_id, ad_id, campaign_id, tactic_id, limit, offset)
     if limit > 0 or offset > 0:
         url = url + "?limit={0}&offset={1}".format(limit, offset)        
     response = self._send_request(url, self.authorized_headers, method="GET")
-    return json.loads(response.text)
+    return self.__get_response_object(response)
 
   def get_avails_by_tactic(self, org_id=0, ad_id=0, campaign_id=0, tactic_id=0, limit=0, offset=0):
     url = "https://{0}/advertiser/campaign-management/v1/organizations/{1}/advertisers/{2}/campaigns/{3}/tactics/{4}/availableinventorysources".format(self.one_host, org_id, ad_id, campaign_id, tactic_id, limit, offset)
     if limit > 0 or offset > 0:
         url = url + "?limit={0}&offset={1}".format(limit, offset)        
     response = self._send_request(url, self.authorized_headers, method="GET")
-    return json.loads(response.text)
+    return self.__get_response_object(response)
 
   def update_inventory_sources_by_tactic(self, org_id=0, ad_id=0, campaign_id=0, tactic_id=0, dsp_ids=[], limit=0, offset=0):
     url = "https://{0}/advertiser/campaign-management/v1/organizations/{1}/advertisers/{2}/campaigns/{3}/tactics/{4}/inventorysources".format(self.one_host, org_id, ad_id, campaign_id, tactic_id, limit, offset)
@@ -338,7 +331,7 @@ class AOLClient:
     if limit > 0 or offset > 0:
         url = url + "?limit={0}&offset={1}".format(limit, offset)        
     response = self._send_request(url, self.authorized_headers, method="PUT", data=json.dumps(data))
-    return json.loads(response.text)
+    return self.__get_response_object(response, data)
 
   def _convert_to_curl(self, method, url, headers, data):
     curl_conversion = "curl -X {} {} ".format(method, url) 
@@ -387,27 +380,7 @@ class AOLClient:
       if method == "PATCH":
           response = requests.patch(url, headers=headers, verify=True, data=data)
 
-      rval = {}
-      codes = [200,201]
-      rval["response_code"] = response.status_code
-      rval["data"] = response.status_code
-      request_body = {
-          "url": url
-      }
-      if data:
-          request_body["data"] = data
-      rval["request_body"] = request_body
-      if response.status_code in codes:
-          rval["msg_type"] = "success"
-      else:
-          rval["msg_type"] = "error"
-
-      try:
-          rval["msg"] = json.loads(response.text)['message']
-      except:
-          rval["msg"] = ""
-
-      return json.dumps(rval)
+      return response
 
       """
       print('--- response.status_code: {} ---'.format(response.status_code))
@@ -426,4 +399,27 @@ class AOLClient:
 
       return response
       """
+
+  def __get_response_object(self, response, data=None):
+      rval = {}
+      codes = [200,201]
+      rval["response_code"] = response.status_code
+      rval["data"] = response.text
+      request_body = {
+          "url": response.url
+      }
+      if data:
+          request_body["data"] = data
+      rval["request_body"] = request_body
+      if response.status_code in codes:
+          rval["msg_type"] = "success"
+      else:
+          rval["msg_type"] = "error"
+
+      try:
+          rval["msg"] = json.loads(response.text)['message']
+      except:
+          rval["msg"] = response.reason
+
+      return json.dumps(rval)
 # eof
