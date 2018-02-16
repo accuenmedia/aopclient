@@ -159,6 +159,12 @@ class AOLClient:
     return self.__get_response_object(response)
 
   def assign_deal_assignments(self, org_id=0, ad_id=0, campaign_id=0, tactic_id=0, deals=[]):
+    current_deals = json.loads(self.get_deal_assignments(org_id, ad_id, tactic_id))
+    remove_deals = []
+    for deal in current_deals.get('data').get('data'):
+      remove_deals.append(deal.get('dealManagementId'))
+    self.unassign_deal_assignments(org_id, ad_id, tactic_id, remove_deals)
+
     url = "https://{0}/advertiser/campaign-management/v1/organizations/{1}/advertisers/{2}/campaigns/{3}/tactics/{4}/dealassignments".format(self.one_host, org_id, ad_id, campaign_id, tactic_id)
     data = []
     for deal in deals:
