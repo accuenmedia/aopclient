@@ -158,6 +158,7 @@ class AOLClient:
     response = self._send_request(url, self.authorized_headers, method="GET")
     return self.__get_response_object(response)
 
+  """
   def assign_deal_assignments(self, org_id=0, ad_id=0, campaign_id=0, tactic_id=0, deals=[]):
     current_deals = json.loads(self.get_deal_assignments(org_id, ad_id, campaign_id, tactic_id))
     remove_deals = []
@@ -174,6 +175,45 @@ class AOLClient:
       self.unassign_deal_assignments(org_id, ad_id, campaign_id, tactic_id, remove_deals)
 
     self.__get_response_object(response, data)
+  """
+  def assign_deal_assignments(self, org_id=0, ad_id=0, campaign_id=0, tactic_id=0, deals=[]):
+    current_deals = json.loads(self.get_deal_assignments(org_id, ad_id, campaign_id, tactic_id))
+    remove_deals = []
+    for deal in current_deals.get('data').get('data'):
+      remove_deals.append(deal.get('dealManagementId'))
+
+    url = "https://{0}/advertiser/campaign-management/v1/organizations/{1}/advertisers/{2}/campaigns/{3}/tactics/{4}/dealassignments".format(self.one_host, org_id, ad_id, campaign_id, tactic_id)
+    data = []
+    for deal in deals:
+        if int(deal) in remove_deals:
+            print int(deal)
+            print "======================="
+            #deals.remove(int(deal))                                                                                                                                                                                                                        
+            remove_deals.remove(int(deal))
+        else:
+            data.append(deal)
+
+    if len(data) > 0:
+        response = self._send_request(url, self.authorized_headers, method="POST", data=json.dumps(data))
+    else:
+        response = None
+
+    if len(remove_deals) > 0:
+        remove = json.loads(self.unassign_deal_assignments(org_id, ad_id, campaign_id, tactic_id, remove_deals))
+        print "REMOVE #$%#$%#$%$#%$#%#$%$#%"
+        print remove
+        print "@#$@#$@#$#@$#@$#@$#@$#@$#@$#@"
+
+    if response:
+        return self.__get_response_object(response, data)
+    else:
+        rval = {
+            "msg": "No new deals were found.",
+            "msg_type": "success",
+            "data": [],
+            "response_code": ""
+        }
+        return json.dumps(rval)
 
   def unassign_deal_assignments(self, org_id=0, ad_id=0, campaign_id=0, tactic_id=0, deals=[]):
     url = "https://{0}/advertiser/campaign-management/v1/organizations/{1}/advertisers/{2}/campaigns/{3}/tactics/{4}/dealassignments".format(self.one_host, org_id, ad_id, campaign_id, tactic_id)
