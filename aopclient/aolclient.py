@@ -181,27 +181,30 @@ class AOLClient:
     response = None
     current_deals = json.loads(self.get_deal_assignments(org_id, ad_id, campaign_id, tactic_id))
     remove_deals = []
+    current_deal_ids = []
     for deal in current_deals.get('data').get('data'):
-        remove_deals.append(deal.get('dealManagementId'))
+        current_deal_ids.append(deal.get('dealManagementId'))
+        if str(deal.get('dealManagementId')) not in deals:
+            remove_deals.append(deal.get('id'))
+
+    add_deals = []
+    for deal in deals:
+        if int(deal) not in current_deal_ids:
+            add_deals.append(deal)
 
     url = "https://{0}/advertiser/campaign-management/v1/organizations/{1}/advertisers/{2}/campaigns/{3}/tactics/{4}/dealassignments".format(
-      self.one_host, 
-      org_id, 
-      ad_id, 
-      campaign_id, 
+      self.one_host,
+      org_id,
+      ad_id,
+      campaign_id,
       tactic_id
     )
-    data = []
-    for deal in deals:
-        if int(deal) in remove_deals:
-            remove_deals.remove(int(deal))
-        else:
-            data.append(deal)
 
-    if len(data) > 0:
-        add_response = self._send_request(url, self.authorized_headers, method="POST", data=json.dumps(data))
+    if len(add_deals) > 0:
+        add_response = self._send_request(url, self.authorized_headers, method="POST", data=json.dumps(add_deals))
         if add_response.status_code not in self.success_codes:
             response = add_response
+            data = add_deals
 
     if len(remove_deals) > 0:
         remove_response = self._send_request(url, self.authorized_headers, method="DELETE", data=json.dumps(remove_deals))
@@ -488,13 +491,19 @@ class AOLClient:
   def __get_response_object(self, response, data=None):
       rval = {}
       rval["response_code"] = response.status_code
-      rval["data"] = json.loads(response.text)
+      try:
+          rval["data"] = json.loads(response.text)
+      except:
+          rval["data"] = response.text
+
       request_body = {
           "url": response.url
       }
+      rval["request_body"] = request_body
+
       if data:
           request_body["data"] = data
-      rval["request_body"] = request_body
+
       if response.status_code in self.success_codes:
           rval["msg_type"] = "success"
       else:
