@@ -46,6 +46,7 @@ class AOLClient:
     self.api_key = os.environ['AOP_API_KEY']
     self.id_host = os.environ['AOP_ID_HOST']
     self.one_host = os.environ['AOP_ONE_HOST']
+    self.success_codes = [200,201]
 
   def connect(self):
     self.set_payload()
@@ -177,43 +178,47 @@ class AOLClient:
     self.__get_response_object(response, data)
   """
   def assign_deal_assignments(self, org_id=0, ad_id=0, campaign_id=0, tactic_id=0, deals=[]):
+    response = None
     current_deals = json.loads(self.get_deal_assignments(org_id, ad_id, campaign_id, tactic_id))
     remove_deals = []
     for deal in current_deals.get('data').get('data'):
-      remove_deals.append(deal.get('dealManagementId'))
+        remove_deals.append(deal.get('dealManagementId'))
 
-    url = "https://{0}/advertiser/campaign-management/v1/organizations/{1}/advertisers/{2}/campaigns/{3}/tactics/{4}/dealassignments".format(self.one_host, org_id, ad_id, campaign_id, tactic_id)
+    url = "https://{0}/advertiser/campaign-management/v1/organizations/{1}/advertisers/{2}/campaigns/{3}/tactics/{4}/dealassignments".format(
+      self.one_host, 
+      org_id, 
+      ad_id, 
+      campaign_id, 
+      tactic_id
+    )
     data = []
     for deal in deals:
         if int(deal) in remove_deals:
-            print int(deal)
-            print "======================="
-            #deals.remove(int(deal))                                                                                                                                                                                                                        
             remove_deals.remove(int(deal))
         else:
             data.append(deal)
 
     if len(data) > 0:
-        response = self._send_request(url, self.authorized_headers, method="POST", data=json.dumps(data))
-    else:
-        response = None
+        add_response = self._send_request(url, self.authorized_headers, method="POST", data=json.dumps(data))
+        if add_response.status_code not in self.success_codes:
+            response = add_response
 
     if len(remove_deals) > 0:
-        remove = json.loads(self.unassign_deal_assignments(org_id, ad_id, campaign_id, tactic_id, remove_deals))
-        print "REMOVE #$%#$%#$%$#%$#%#$%$#%"
-        print remove
-        print "@#$@#$@#$#@$#@$#@$#@$#@$#@$#@"
+        remove_response = self._send_request(url, self.authorized_headers, method="DELETE", data=json.dumps(remove_deals))
+        if remove_response.status_code not in self.success_codes:
+            response = remove_response
+            data = remove_deals
 
-    if response:
-        return self.__get_response_object(response, data)
-    else:
-        rval = {
-            "msg": "No new deals were found.",
+    if response is None:
+        response = {
             "msg_type": "success",
-            "data": [],
-            "response_code": ""
+            "msg": "Deals managed",
+            "response_code": "",
+            "data": ""
         }
-        return json.dumps(rval)
+        return json.dumps(response)
+    else:
+        return self.__get_response_object(response, data)
 
   def unassign_deal_assignments(self, org_id=0, ad_id=0, campaign_id=0, tactic_id=0, deals=[]):
     url = "https://{0}/advertiser/campaign-management/v1/organizations/{1}/advertisers/{2}/campaigns/{3}/tactics/{4}/dealassignments".format(self.one_host, org_id, ad_id, campaign_id, tactic_id)
@@ -348,13 +353,15 @@ class AOLClient:
 
     for domain in domains:
       row = {}
-      row["path"] = "/domains/" + str(domain)
+      row["path"] = "/domains"
+      row["value"] = str(domain)
       row["op"] = "add"
       data.append(row)
 
     for app in apps:
       row = {}
-      row["path"] = "/apps/" + str(app)
+      row["path"] = "/apps"
+      row["value"] = str(app)
       row["op"] = "add"
       data.append(row)
 
@@ -480,7 +487,6 @@ class AOLClient:
 
   def __get_response_object(self, response, data=None):
       rval = {}
-      codes = [200,201]
       rval["response_code"] = response.status_code
       rval["data"] = json.loads(response.text)
       request_body = {
@@ -489,7 +495,7 @@ class AOLClient:
       if data:
           request_body["data"] = data
       rval["request_body"] = request_body
-      if response.status_code in codes:
+      if response.status_code in self.success_codes:
           rval["msg_type"] = "success"
       else:
           rval["msg_type"] = "error"
