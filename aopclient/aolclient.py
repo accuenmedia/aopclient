@@ -355,18 +355,24 @@ class AOLClient:
       data.append(row)
 
     for domain in domains:
-      row = {}
-      row["path"] = "/domains"
-      row["value"] = str(domain)
-      row["op"] = "add"
-      data.append(row)
+      try:
+        row = {}
+        row["path"] = "/domains"
+        row["value"] = str(domain)
+        row["op"] = "add"
+        data.append(row)
+      except:
+        continue
 
     for app in apps:
-      row = {}
-      row["path"] = "/apps"
-      row["value"] = str(app)
-      row["op"] = "add"
-      data.append(row)
+      try:
+        row = {}
+        row["path"] = "/apps"
+        row["value"] = str(app)
+        row["op"] = "add"
+        data.append(row)
+      except:
+        continue
 
     response = self._send_request(url, self.authorized_headers, method="PATCH", data=json.dumps(data))
     return self.__get_response_object(response, data)
@@ -512,7 +518,7 @@ class AOLClient:
       try:
           rval["msg"] = json.loads(response.text)['message']
       except:
-          rval["msg"] = response.reason
+          rval["msg"] = response.text
 
       return json.dumps(rval)
 # eof
