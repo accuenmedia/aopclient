@@ -377,10 +377,11 @@ class AOLClient:
     response = self._send_request(url, self.authorized_headers, method="PATCH", data=json.dumps(data))
     return self.__get_response_object(response, data)
 
-  def update_tactics_whitelist(self, org_id=0, ad_id=0, campaign_id=0, tactic_id=0, whitelist_id=0):
+  def update_tactics_whitelist(self, org_id=0, ad_id=0, campaign_id=0, tactic_id=0, whitelist_ids=[]):
     url = "https://{0}/advertiser/campaign-management/v1/organizations/{1}/advertisers/{2}/campaigns/{3}/tactics/{4}/whitelists".format(self.one_host, org_id, ad_id, campaign_id, tactic_id)
-    data = {}
-    data['whitelistid'] = whitelist_id
+    data = []
+    for id in whitelist_ids:
+      data.append(int(id))
     response = self._send_request(url, self.authorized_headers, method="PUT", data=json.dumps(data))
     return self.__get_response_object(response, data)
 
