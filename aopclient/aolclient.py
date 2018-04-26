@@ -519,7 +519,7 @@ class AOLClient:
       try:
           rval["msg"] = json.loads(response.text)['message']
       except:
-          rval["msg"] = response.text
+          rval["msg"] = json.loads(response.text)
 
       return json.dumps(rval)
 # eof
